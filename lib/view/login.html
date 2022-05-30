@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="">
+</head>
+<style>
+   
+    .login{
+        display: flex;
+        justify-content: center;
+    }
+
+    .container{
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        width: 50%;
+        margin: auto;
+    }
+    .account{
+        width: 50%;
+        margin: auto;
+    }
+    .password{
+        width: 50%;
+        margin: auto;
+    }
+    .send{
+        width: 50%;
+        margin: auto;
+    }
+</style>
+<body>
+    <div class="wrapper">
+        <div class="title-text">
+            <div class="title login">
+                Login
+            </div>
+        </div>
+        <form>
+            <div class="container">
+                <label for="cheese" class="account" >帳號:</label><input id="input1" class="account" name="account" type="text">
+                <label for="cheese" class="password" >密碼:</label><input id="input2" class="password" name="password" type="text">
+                <input id="btn" type="button" class="send" value="送出">
+            </div>
+        </form>
+    </div>
+
+    <script>
+        
+        document.querySelector('#btn').addEventListener('click', ()=>{
+
+            const fd = new FormData(document.querySelector('form'));
+            const data = {account:fd.get('account'),password:fd.get('password')};
+
+            fetch('http://127.0.0.1:3000/login', 
+            {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: { 'content-type': 'application/json' },
+            })
+            .then((res) => res.json())
+            .then((data) => {
+
+                if(data.status==='fail'){
+                    alert(data.msg);
+                }else{
+                    alert(data.msg);
+                    window.location = "./";
+                }
+            });
+        });
+
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="title-text">
+            <div class="title register">
+                Register
+            </div>
+        </div>
+        <div class="form-container">
+            <form>
+                <div class="field">
+                    <input type="text" name="name" placeholder=" name" required>
+                </div>
+                <div class="field">
+                    <input type="text" name="account" placeholder=" account" required>
+                </div>
+                <div class="field">
+                    <input type="password" name="password" placeholder=" Password" required>
+                </div>
+                
+                <div class="field btn">
+                    <input type="submit" value="Signup">
+                </div>
+            </form>
+        </div>
+        <div>
+            <div class="login">Have an account? Go to <a href="./login">Login</a>.</div>
+        </div>
+    </div>
+
+    <script>
+        // let btnEl = document.querySelector('.btn');
+        // btnEl.addEventListener('click', () => 
+        // {
+        //     fetch('http://192.168.254.36/register')
+        // });
+
+        document.querySelector('form').addEventListener('submit', submitHandler);
+
+        function submitHandler(e){
+            e.preventDefault();
+            
+            const fd = new FormData(document.querySelector('form'));
+            
+            const data = {name:'12',account:fd.get('account'),password:fd.get('password'),name:fd.get('name')};
+
+            fetch('http://127.0.0.1:3000/register', 
+            {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: { 'content-type': 'application/json' },
+            })
+            .then((res) => res.json())
+            .then((data) => {
+
+                if(data.status==='fail'){
+                    alert(data.msg);
+                }else{
+                    alert(data.msg);
+                    //window.location = "./login.html";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

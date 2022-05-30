@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<style>
+    .groupcontent{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 20%;
+        margin: auto;
+    }
+    .groupbutton{
+        display: flex;
+        justify-content: space-between;
+    }
+    .groupTitle{
+        display: flex;
+        justify-content: space-between;
+    }
+</style>
+<body>
+    <div class="wrapper">
+        <div class="title-text">
+            <div class="title groupcontent">
+                <div class="groupTitle">
+                    <div class="groupPerson">群組人員</div>
+                    <div class="acceptPerson"><button id="accept" >申請名單</button></div>
+                </div>
+              
+
+                <div class="groupbutton">
+                    <div class="name">name</div>
+                    <div class="point">point</div>
+                    <div class="edit">edit</div>
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>
+<script>
+    const getUrlString = location.href;
+    const url = new URL(getUrlString);
+    //console.log(url.searchParams.get('group_id'));
+    const acceptBtn = document.querySelector('#accept');
+    send();
+    acceptBtn.addEventListener('click',(e)=>{
+        
+        fetch('http://127.0.0.1:3000/checkLevelBtn', 
+       {
+           method: 'post',
+           body: JSON.stringify({group_id:url.searchParams.get('group_id')}),
+           headers: { 'content-type': 'application/json' },
+       })
+       .then((res) => res.json())
+       .then((data) => {
+
+           if(data.status==='fail'){
+               alert(data.msg);
+           }else{
+               //console.log(data);
+               
+               window.location = "./groupaccept?group_id="+url.searchParams.get('group_id'); 
+           }
+       });
+
+    });
+    function send(){
+        
+       fetch('http://127.0.0.1:3000/groupContent', 
+       {
+           method: 'post',
+           body: JSON.stringify({group_id:url.searchParams.get('group_id')}),
+           headers: { 'content-type': 'application/json' },
+       })
+       .then((res) => res.json())
+       .then((data) => {
+
+           if(data.status==='fail'){
+               alert(data.msg);
+           }else{
+                console.log(data.msg);
+               for( key in data.msg){
+                const groupbutton = document.createElement('div')
+                const groupName = document.createElement('div')
+                const groupPoint = document.createElement('div')
+                const groupEdit = document.createElement('div')
+                groupbutton.classList.add('groupbutton')
+                groupName.classList.add('name')
+                groupPoint.classList.add('point')
+                groupEdit.classList.add('edit')
+                groupName.textContent = data.msg[key].name;
+                groupPoint.textContent = data.msg[key].point;
+                groupEdit.innerHTML = `<button class="deleteBtn" id="${data.msg[key].group_user_id}" >踢除</button>`;
+                groupbutton.append(groupName,groupPoint,groupEdit)
+                document.querySelector('.groupcontent').append(groupbutton)
+               }
+
+                const deleteBtns = document.querySelectorAll('.deleteBtn');
+                deleteBtns.forEach((item)=>{
+
+                    item.addEventListener('click',()=>{
+                        
+                        doFetch('http://127.0.0.1:3000/deleteUser',{group_user_id:item.getAttribute('id')},(data)=>{
+                            console.log(data);
+                        });
+                    })
+                    
+                });
+           }
+       });
+
+    
+    }
+
+    function doFetch(url,data,resultFn){
+        fetch(url, 
+        {
+            method: 'post',
+            body: JSON.stringify(data),
+            headers: { 'content-type': 'application/json' },
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            resultFn(data);
+        });
+    }
+    function send3(){
+        
+        fetch('http://127.0.0.1:3000/updateToken', 
+        {
+            method: 'post',
+            body: JSON.stringify({group_id:url.searchParams.get('group_id')}),
+            headers: { 'content-type': 'application/json' },
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            
+            console.log(data);
+        });
+    }
+</script>

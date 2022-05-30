@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="title-text">
+            <div class="title register">
+                groupcreate
+            </div>
+        </div>
+        <div class="form-container">
+            <input type="text" id="name" value="">
+            <input type="button" id="send"  value="送出">
+        </div>
+        
+    </div>
+</body>
+</html>
+<script>
+     document.querySelector('#send').addEventListener('click', send);
+     function send(){
+         
+        const data = {
+            'groupName':document.querySelector('#name').value,
+        };
+
+        fetch('http://127.0.0.1:3000/groupcreate', 
+        {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: { 'content-type': 'application/json' },
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            console.log(data);
+            if(data.status==='fail'){
+                alert(data.msg);
+            }else{
+                alert(data.msg);
+                //window.location = "./grouplist"; 
+            }
+        });
+
+     }
+</script>

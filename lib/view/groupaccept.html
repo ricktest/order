@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<style>
+    .content{
+        width: 50%;
+    }
+   .acceptName{
+       display: flex;
+       justify-content: space-between;
+   }
+   .acceptName div{
+       width: 100%;
+   }
+</style>
+<body>
+    <div class="wrapper">
+        <div class="title-text">
+            <div class="title groupcontent">
+                
+                <div class="token">
+                    token:<input value="" name="token" id="token">
+                    <button id="tokenUpdate" >刷新</button>
+                </div>
+                <div class="groupTitle">
+                    <div class="groupPerson">申請人員</div>
+                </div>
+                <div class="content">
+                    <div class="acceptName"> 
+                        <div class="name">name</div>
+                        <div class="date">date</div>
+                        <div class="edit">edit</div>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>
+<script>
+    const getUrlString = location.href;
+    const url = new URL(getUrlString);
+    const token = document.querySelector('#token');
+    
+     fetch('http://127.0.0.1:3000/acceptHandle', 
+       {
+           method: 'post',
+           body: JSON.stringify({group_id:url.searchParams.get('group_id')}),
+           headers: { 'content-type': 'application/json' },
+       })
+       .then((res) => res.json())
+       .then((data) => {
+
+           if(data.status==='fail'){
+               alert(data.msg);
+           }else{
+                console.log(data);
+                token.value = data.token;
+               for( key in data.result){
+                const acceptName = document.createElement('div')
+                const name = document.createElement('div')
+                const date = document.createElement('div')
+                const edit = document.createElement('div')
+                acceptName.classList.add('acceptName')
+                name.classList.add('name')
+                date.classList.add('date')
+                edit.classList.add('edit')
+                name.textContent = data.result[key].name;
+                date.textContent = data.result[key].date;
+                edit.innerHTML = `<button class="acceptBtn" id="${data.result[key].id}" >接受</button><button>拒絕</button>`;
+               
+                acceptName.append(name,date,edit)
+                document.querySelector('.content').append(acceptName)
+
+               }
+                const acceptBtns = document.querySelectorAll('.acceptBtn');
+                acceptBtns.forEach((item)=>{
+
+                    item.addEventListener('click',()=>{
+                        
+                        doFetch('http://127.0.0.1:3000/acceptAccount',{group_permit_list_id:item.getAttribute('id')},(data)=>{
+                            console.log(data);
+                        });
+                    })
+                    
+                });
+              
+           }
+       });
+       const tokenUpdate = document.querySelector('#tokenUpdate');
+       tokenUpdate.addEventListener('click',()=>{
+          
+            doFetch('http://127.0.0.1:3000/updateToken',{group_id:url.searchParams.get('group_id')},(data)=>{
+                console.log(data);
+                if(data.status === 'ok') history.go(0);
+            });
+       });
+       function doFetch(url,data,resultFn){
+
+            fetch(url, 
+            {
+                method: 'post',
+                body: JSON.stringify(data),
+                headers: { 'content-type': 'application/json' },
+            })
+            .then((res) => res.json())
+            .then((data) => {
+                resultFn(data);
+            });
+       }
+</script>

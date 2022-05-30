@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<style>
+    .grouplist{
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        width: 20%;
+        margin: auto;
+    }
+    .groupItem{
+        display: flex;
+        justify-content: space-between;
+    }
+    .title-text{
+        text-align: end;
+    }
+</style>
+<body>
+    <div class="wrapper">
+        <div class="title-text">
+            
+            <div class="title grouplist">
+                <a href="./joincontent"> 申請</a>
+               <div class="groupItem">
+                    <div class="group-name">群組名稱</div>
+                    <div class="group-isAccept">是否接受</div>
+               </div>
+               
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>
+<script>
+    //document.querySelector('#send').addEventListener('click', send);
+    const own = document.querySelector('#own');
+    const other = document.querySelector('#other');
+    const groupList = document.querySelector('.grouplist')
+
+    send();
+    
+    function send(){
+       fetch('http://127.0.0.1:3000/joinlist', 
+       {
+           method: 'POST',
+           body: JSON.stringify({type:'own'}),
+           headers: { 'content-type': 'application/json' },
+       })
+       .then((res) => res.json())
+       .then((data) => {
+           
+           if(data.status==='fail'){
+               alert(data.msg);
+           }else{
+               console.log(data.msg);
+               for( key in data.msg){
+                const groupItem = document.createElement('div')
+                const groupName = document.createElement('div')
+                const groupAccept = document.createElement('div')
+                groupItem.classList.add('groupItem')
+                groupName.classList.add('group-name')
+                groupAccept.classList.add('group-isAccept')
+                groupName.textContent = data.msg[key].group_name;
+                switch (data.msg[key].is_accept) {
+                    case 0:
+                        groupAccept.textContent = '處理中';
+                       break;
+                    case 1:
+                        groupAccept.textContent = '接受';
+                       break;
+                    case 2:
+                        groupAccept.textContent = '拒絕';
+                       break;
+                   default:
+                       break;
+               }
+                
+                groupItem.append(groupName,groupAccept)
+                groupList.append(groupItem)
+
+               }
+               //window.location = "./grouplist"; 
+           }
+       });
+
+    }
+
+    function send2(){
+       fetch('http://127.0.0.1:3000/grouplist', 
+       {
+           method: 'POST',
+           body: JSON.stringify({type:'other'}),
+           headers: { 'content-type': 'application/json' },
+       })
+       .then((res) => res.json())
+       .then((data) => {
+           
+           if(data.status==='fail'){
+               alert(data.msg);
+           }else{
+               console.log(data);
+                for (const key in data.msg) {
+                    
+                    other.innerHTML += '<div class="p">群組名稱:'+'<a>'+data.msg[key].group_name+'</a>'+'</div>';
+                    //console.log(key, data.msg[key]);
+                }
+               //window.location = "./grouplist"; 
+           }
+       });
+
+    }
+</script>
